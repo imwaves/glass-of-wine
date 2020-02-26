@@ -39,15 +39,21 @@ canvas {
 }
 
 #intro {
-  border: 10px solid blue;
+  border: 10px solid #ff00ec;
   bottom: 0;
-  background: navy
+  background: #000067;
+  
+  background: linear-gradient(25deg, #6358fa, #d700ffde);
+  background-size: 45px 9px;
+  box-sizing: border-box;
+  animation: 3s unblur ease-out;
 }
   #intro p {
     font-size: 16px;
     max-width: 80vw;
     margin-top: 10px;
     text-align: center;
+    opacity: .7;
   }
 
   #intro button {
@@ -159,4 +165,12 @@ canvas {
   0% { background-position: 0 0; }
   50% { background-position: 0% 100%; }
   100% { background-position: 0 0; }
+}
+
+@keyframes unblur {
+  0% { filter: blur(20px) contrast(20) }
+  20% { filter: blur(5px) contrast(2) contrast(5) }
+  50% { filter: blur(3px) contrast(0) contrast(2) }
+  80% { filter: blur(0) contrast(1.1) }
+  100% { filter: blur(0) contrast(1) }
 }
