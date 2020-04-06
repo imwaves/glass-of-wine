@@ -2,14 +2,14 @@ const $intro = ge('#intro');
 
 ge.call($intro, 'button').addEventListener('click', function (e) {
     $intro.classList.add('--hide');
-    $intro.addEventListener('transitionend', function () { 
+    setTimeout(() => { // transitionend doesnt work on iOS
         $intro.parentNode && $intro.parentNode.removeChild($intro);
-        window.orientation != null && document.body.requestFullscreen({ navigationUI: 'hide' });
-        setTimeout(Outpour, 1000);
-    })
+        window.orientation != null && document.body.requestFullscreen && document.body.requestFullscreen({ navigationUI: 'hide' });
+        setTimeout(start, 1000);
+    }, 300);
 });
 
-function Outpour () {
+function start () {
     var W = Math.min(600, window.innerWidth);
     var H = window.innerHeight;
     var Engine = Matter.Engine,
@@ -60,10 +60,10 @@ function Outpour () {
     const thick = Math.max(W, H) / 2;
     World.add(world, [
         // walls
-        Bodies.rectangle(W/2, -thick/2 +pad, W, thick, { isStatic: true, slop: 0 }),
-        Bodies.rectangle(W/2, H +thick/2 -pad, W, thick, { isStatic: true, slop: 0 }),
-        Bodies.rectangle(W +thick/2 -pad, H/2, thick, H, { isStatic: true, slop: 0 }),
-        Bodies.rectangle(0 -thick/2 +pad, H/2, thick, H, { isStatic: true, slop: 0 }),
+        Bodies.rectangle(W/2, -thick/2 +pad, W, thick, { isStatic: true, slop: 0, label: 'wall' }),
+        Bodies.rectangle(W/2, H +thick/2 -pad, W, thick, { isStatic: true, slop: 0, label: 'wall' }),
+        Bodies.rectangle(W +thick/2 -pad, H/2, thick, H, { isStatic: true, slop: 0, label: 'wall' }),
+        Bodies.rectangle(0 -thick/2 +pad, H/2, thick, H, { isStatic: true, slop: 0, label: 'wall' }),
         // ...circles
     ]);
 
@@ -82,6 +82,7 @@ function Outpour () {
     var MAX_BODIES = 600;
     var TIME_BETWEEN_SPAWN = 20;
     var circles = [];
+    const isIOS = navigator.userAgent.match(/iPhone|iPad/);
     setTimeout(() => {
         for (let i = 0; i < MAX_BODIES; i++) {
             (function (i) {
@@ -151,20 +152,22 @@ function Outpour () {
     // keep the mouse in sync with rendering
     render.mouse = mouse;
 
-    var lastBody;
+    var lastBodies = [];
     var scale = 3;
     Events.on(mouseConstraint, 'mousedown', e => {
-        const { body } = mouseConstraint;
-        if (body && !lastBody) {
+        const body = mouseConstraint.body;
+
+        if (body && body.label !== 'wall' && !~lastBodies.indexOf(lastBodies)) {
             body.vertices = Vertices.scale(body.vertices, scale, scale);
-            lastBody = body;
+            lastBodies.push(body);
         }
     });
 
     Events.on(mouseConstraint, 'mouseup', e => {
-        const { body } = mouseConstraint;
-        if (lastBody) {
-            lastBody.vertices = Vertices.scale(lastBody.vertices, 1/scale, 1/scale);
+        // console.log(e, lastBodies);
+        if (lastBodies.length) {
+            const body = lastBodies.shift();
+            body.vertices = Vertices.scale(body.vertices, 1/scale, 1/scale);
         }
     });
     
@@ -174,31 +177,30 @@ function Outpour () {
         max: { x: W, y: H }
     });
 
-    var ax;
-    var updateGravity = function(event) {
+    var updateGravity = function(e) {
         var orientation = typeof window.orientation !== 'undefined' ? window.orientation : 0,
             gravity = engine.world.gravity;
 
-        ax = event.acceleration;
+        // console.log(e)
         if (orientation === 0) {
-            gravity.x = Common.clamp(event.gamma, -90, 90) / 90 * 3;
-            gravity.y = Common.clamp(event.beta, -90, 90) / 90 * 3;
+            gravity.x = Common.clamp(e.gamma, -90, 90) / 90 * 3;
+            gravity.y = Common.clamp(e.beta, -90, 90) / 90 * 3;
         } else if (orientation === 180) {
-            gravity.x = Common.clamp(event.gamma, -90, 90) / 90 * 3;
-            gravity.y = Common.clamp(-event.beta, -90, 90) / 90 * 3;
+            gravity.x = Common.clamp(e.gamma, -90, 90) / 90 * 3;
+            gravity.y = Common.clamp(-e.beta, -90, 90) / 90 * 3;
         } else if (orientation === 90) {
-            gravity.x = Common.clamp(event.beta, -90, 90) / 90 * 3;
-            gravity.y = Common.clamp(-event.gamma, -90, 90) / 90 * 3;
+            gravity.x = Common.clamp(e.beta, -90, 90) / 90 * 3;
+            gravity.y = Common.clamp(-e.gamma, -90, 90) / 90 * 3;
         } else if (orientation === -90) {
-            gravity.x = Common.clamp(-event.beta, -90, 90) / 90 * 3;
-            gravity.y = Common.clamp(event.gamma, -90, 90) / 90 * 3;
+            gravity.x = Common.clamp(-e.beta, -90, 90) / 90 * 3;
+            gravity.y = Common.clamp(e.gamma, -90, 90) / 90 * 3;
         }
-        gravity.x -= a.x;
+        // gravity.x -= x;
         // if (accel.x > 0) accel.x = Math.max(0, accel.x - 1);
         // if (accel.x < 0) accel.x = Math.min(0, accel.x + 1);
         // accel.x /= 1.2;
 
-        gravity.y += a.y;
+        // gravity.y += y;
         // if (accel.y > 0) accel.y = Math.max(0, accel.y - 1);
         // if (accel.y < 0) accel.y = Math.min(0, accel.y + 1);
         // accel.y /= 1.2;
@@ -213,10 +215,15 @@ function Outpour () {
     };
 
     window.addEventListener('deviceorientation', updateGravity);
+    window.addEventListener('devicemotion', e => {
+        const gravity = engine.world.gravity;
+        gravity.x -= e.acceleration.x;
+        gravity.y += e.acceleration.y;
+    });
 
     // window.addEventListener("devicemotion", deviceMotionHandler);
-    var a = new LinearAccelerationSensor({frequency: 30});
-    a.start();
+    // var a = new LinearAccelerationSensor({frequency: 30});
+    // a.start();
     // var a = new Accelerometer({frequency: 30});
     var accel = { x: 0, y: 0 };
 

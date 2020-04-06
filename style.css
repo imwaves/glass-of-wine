@@ -9,11 +9,16 @@ canvas {
   /*filter: blur(10px) contrast(10);*/
 }
 
+a {
+  text-decoration: none
+}
+
 #ui {
   padding: 0 16px;
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
+  bottom: auto;
 }
 
 #debug {
@@ -24,7 +29,7 @@ canvas {
 
 .u-abs {
   position: absolute;
-  left: 0; right: 0; top: 0;
+  left: 0; right: 0; top: 0; bottom: 0;
 }
 
 .u-flex--center {
@@ -91,6 +96,41 @@ canvas {
     background: #7e7eafc9;
     box-shadow: 2px 3px 15px 0 black inset;
   }
+
+  #intro footer {
+    top: auto;
+    bottom: 0;
+    padding: 6px;
+    z-index: 100;
+  }
+
+  #intro footer p {
+    margin: 0;
+    max-width: none;
+    text-align: left;
+  }
+
+.i-rotat {
+  display: inline-block;
+  background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaGVpZ2h0PSIyNHB4IiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0cHgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6c2tldGNoPSJodHRwOi8vd3d3LmJvaGVtaWFuY29kaW5nLmNvbS9za2V0Y2gvbnMiIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj48dGl0bGUvPjxkZXNjLz48ZGVmcy8+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBpZD0iUGFnZS0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSI+PGcgZmlsbD0iI2ZmZmZmZiIgaWQ9Ikljb25zLURldmljZSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTIxMC4wMDAwMDAsIC0xMjQuMDAwMDAwKSI+PGcgaWQ9InNjcmVlbi1yb3RhdGlvbiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjEwLjAwMDAwMCwgMTI0LjAwMDAwMCkiPjxwYXRoIGQ9Ik0xNi41LDIuNSBDMTkuOCw0IDIyLjEsNy4yIDIyLjUsMTEgTDI0LDExIEMyMy40LDQuOCAxOC4zLDAgMTIsMCBMMTEuMywwIEwxNS4xLDMuOCBMMTYuNSwyLjUgTDE2LjUsMi41IFogTTEwLjIsMS43IEM5LjYsMS4xIDguNywxLjEgOC4xLDEuNyBMMS43LDguMSBDMS4xLDguNyAxLjEsOS42IDEuNywxMC4yIEwxMy43LDIyLjIgQzE0LjMsMjIuOCAxNS4yLDIyLjggMTUuOCwyMi4yIEwyMi4yLDE1LjggQzIyLjgsMTUuMiAyMi44LDE0LjMgMjIuMiwxMy43IEwxMC4yLDEuNyBMMTAuMiwxLjcgWiBNMTQuOCwyMS4yIEwyLjgsOS4yIEw5LjIsMi44IEwyMS4yLDE0LjggTDE0LjgsMjEuMiBMMTQuOCwyMS4yIFogTTcuNSwyMS41IEM0LjIsMjAgMS45LDE2LjggMS41LDEzIEwwLjEsMTMgQzAuNiwxOS4yIDUuNywyNCAxMiwyNCBMMTIuNywyNCBMOC45LDIwLjIgTDcuNSwyMS41IEw3LjUsMjEuNSBaIiBpZD0iU2hhcGUiLz48L2c+PC9nPjwvZz48L3N2Zz4=');
+  width: 24px;
+  height: 24px;
+  background-size: cover;
+  color: white;
+  position: relative;
+}
+
+.i-rotat:after {
+  content: '';
+  width: 34px;
+  height: 2px;
+  background: white;
+  transform: rotate(-45deg);
+  position: absolute;
+  top: 11px;
+  left: -5px;
+  opacity: .8;
+}
 
 #intro.--hide {
   opacity: 0;
